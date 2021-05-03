@@ -1,12 +1,14 @@
 {
-    "autoload": {
-        "psr-4": {
-            "Console\\":"src"
-        },
-        "classmap": ["src"]
-    },
-    "require": {
-        "symfony/console": "^5.2",
-        "phpunit/phpunit": "^8.5"
-    }
+    "name": "khaledmostafa/backup-man",
+    "description": "Backup-man used for backup sites and databases and upload them on AWS S3",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Khaled Mostafa",
+            "email": "khaledmostafa297@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
 }
