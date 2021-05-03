@@ -6,6 +6,7 @@
         "classmap": ["src"]
     },
     "require": {
-        "symfony/console": "^5.2"
+        "symfony/console": "^5.2",
+        "phpunit/phpunit": "^8.5"
     }
 }
