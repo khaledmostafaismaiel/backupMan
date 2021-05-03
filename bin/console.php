@@ -9,4 +9,5 @@ $application = new Application();
 // ... register commands
 $application->add(new \Console\App\Commands\HelloWorldCommand());
 $application->add(new \Console\App\Commands\BackupDatabaseCommand());
+$application->add(new \Console\App\Commands\BackupSiteCommand());
 $application->run();
