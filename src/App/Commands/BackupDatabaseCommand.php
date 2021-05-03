@@ -36,19 +36,25 @@ class BackupDatabaseCommand extends Command
 
         $server_id=$input->getArgument("server_id");
         $databasesBackupOption=$input->getArgument("backup_type");
-        $databases_storage_local_path_root="/database_backup";
+        $databases_storage_local_path_root="/backup_database";
         $aws_config_file_profile=$input->getArgument("profile");
         $bucket_name=$input->getArgument("bucket_name");
+        $backup_logs_directory = "/backup_logs";
+        $backup_logs_file = $backup_logs_directory."/backup_log_database_".$server_id.".txt";
         ##################################################################################################################
         $output->writeln('<comment>Database backup locally...'.date("Y/m/d H:i:s").'</comment>');
+        if(! is_dir($backup_logs_directory) ){
+            system("mkdir ".$backup_logs_directory);
+            system("chmod 777 -R ".$backup_logs_directory);
+        }
         if(! is_dir($databases_storage_local_path_root) ){
-            system("mkdir ".$databases_storage_local_path_root);
-            system("chmod 777 -R ".$databases_storage_local_path_root);
+            system("mkdir ".$databases_storage_local_path_root." >> ".$backup_logs_file);
+            system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         }
         ##################################################################################################################
         if( ($databasesBackupOption == 2) || ($databasesBackupOption == 3) ){
-            system("chmod 777 - R /var/lib/mysql");
-            system("rsync -av --delete /var/lib/mysql ".$databases_storage_local_path_root);
+            system("chmod 777 - R /var/lib/mysql"." >> ".$backup_logs_file);
+            system("rsync -av --delete /var/lib/mysql ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         }
 
         if( ($databasesBackupOption == 1) || ($databasesBackupOption == 3) ){
@@ -60,15 +66,15 @@ class BackupDatabaseCommand extends Command
 
             foreach($databases as $db){
                 if( (($db != "information_schema")) && (($db != "performance_schema")) && (($db != "mysql")) && (($db != "_*" )) && (($db != "phpmyadmin")) && (($db != "sys")) ){
-                    system("mysqldump -u ".$user." -p".$password." --databases ".$db." > ".$databases_storage_local_path_root."/".$db."sql");
+                    system("mysqldump -u ".$user." -p".$password." --databases ".$db." > ".$databases_storage_local_path_root."/".$db."sql"." >> ".$backup_logs_file);
                 }
             }
         }
         ##################################################################################################################
-        system("chmod 777 -R ".$databases_storage_local_path_root);
+        system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Database backup on S3...</comment>');
-        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/".$server_id." --profile ".$aws_config_file_profile);
+        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/".$server_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Database backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 

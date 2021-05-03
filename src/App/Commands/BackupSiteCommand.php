@@ -35,22 +35,28 @@ class BackupSiteCommand extends Command
         $backup_dir_local_path = $sites_storage_local_path_root."/".$site_id;
         $aws_config_file_profile = $input->getArgument("profile");
         $bucket_name = $input->getArgument("bucket_name");
+        $backup_logs_directory = "/backup_logs";
+        $backup_logs_file = $backup_logs_directory."/backup_log_site_".$site_id.".txt";
         ##################################################################################################################
         $output->writeln('<comment>Site backup locally...'.date("Y/m/d H:i:s").'</comment>');
+        if(! is_dir($backup_logs_directory) ){
+            system("mkdir ".$backup_logs_directory);
+            system("chmod 777 -R ".$backup_logs_directory);
+        }
         if(! is_dir($sites_storage_local_path_root) ){
-            system("mkdir ".$sites_storage_local_path_root);
-            system("chmod 777 -R ".$sites_storage_local_path_root);
+            system("mkdir ".$sites_storage_local_path_root." >> ".$backup_logs_file);
+            system("chmod 777 -R ".$sites_storage_local_path_root." >> ".$backup_logs_file);
         }
         if(! is_dir($backup_dir_local_path) ){
-            system("mkdir ".$backup_dir_local_path);
-            system("chmod 777 -R ".$backup_dir_local_path);
+            system("mkdir ".$backup_dir_local_path." >> ".$backup_logs_file);
+            system("chmod 777 -R ".$backup_dir_local_path." >> ".$backup_logs_file);
         }
         ##################################################################################################################
-        system("rsync -av --delete ".$site_root." ".$backup_dir_local_path);
-        system("chmod -R 777 ".$sites_storage_local_path_root);
+        system("rsync -av --delete ".$site_root." ".$backup_dir_local_path." >> ".$backup_logs_file);
+        system("chmod -R 777 ".$sites_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Site backup on S3...</comment>');
-        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/backup_sites/".$site_id." --profile ".$aws_config_file_profile);
+        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/backup_sites/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Site backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 
