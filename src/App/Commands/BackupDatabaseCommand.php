@@ -40,7 +40,7 @@ class BackupDatabaseCommand extends Command
         $aws_config_file_profile=$input->getArgument("profile");
         $bucket_name=$input->getArgument("bucket_name");
         ##################################################################################################################
-        $output->writeln('<comment>Database backup locally...</comment>');
+        $output->writeln('<comment>Database backup locally...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($databases_storage_local_path_root) ){
             system("mkdir ".$databases_storage_local_path_root);
             system("chmod 777 -R ".$databases_storage_local_path_root);
@@ -70,7 +70,7 @@ class BackupDatabaseCommand extends Command
         $output->writeln('<comment>Database backup on S3...</comment>');
         system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/".$server_id." --profile ".$aws_config_file_profile);
         ##################################################################################################################
-        $output->writeln("Database backup done successfully.");
+        $output->writeln("Database backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 
         return 0;
     }
