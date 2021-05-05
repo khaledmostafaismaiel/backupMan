@@ -12,7 +12,7 @@ class RestoreDatabaseCommand extends Command
     protected function configure()
     {
         $this->setName("restore-database")
-                ->setHelp("database server_id user password profile bucket_name at profile
+                ->setHelp("restore-database server_id user password bucket_name at profile
                                     server_id=if you have many servers
                                     user=mysql user name if type [1,3]
                                     password=mysql user password if type [1,3]
@@ -56,7 +56,7 @@ class RestoreDatabaseCommand extends Command
         }
         ##################################################################################################################
         $output->writeln('<comment>restore database from S3 ...."'.$databases_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
-        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$databases_storage_local_path_root." -p database_backup -t '".$at."' --max-workers 100 >> ".$restore_logs_file);
+        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$databases_storage_local_path_root." -p database_backup -t '".$at."' --max-workers 100 >> ".$restore_logs_file." &");
         ##################################################################################################################
         $output->writeln("Database restore done successfully.".date("Y/m/d H:i:s")."\n\n");
 

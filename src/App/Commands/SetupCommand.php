@@ -21,8 +21,8 @@ class SetupCommand extends Command
         system("systemctl enable cron");
         system("touch /var/spool/cron/crontabs/root");
         system("chmod 600 /var/spool/cron/crontabs/root");
-        system("snap install aws-cli --classic");
         #install aws cli
+        system("snap install aws-cli --classic");
         system("mkdir ~/.aws");
         system("touch ~/.aws/config");
         system("touch ~/.aws/credentials");

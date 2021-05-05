@@ -11,8 +11,8 @@ class BackupSiteCommand extends Command
 {
     protected function configure()
     {
-        $this->setName("site")
-                ->setHelp("site site_id site_path profile bucket_name [include] [exclude]
+        $this->setName("backup-site")
+                ->setHelp("backup-site site_id site_path profile bucket_name [include] [exclude]
                                     site_id=if you have many sites
                                     site_root=site path
                                     profile=aws user profile
@@ -22,8 +22,6 @@ class BackupSiteCommand extends Command
                 ->addArgument("site_root",InputArgument::REQUIRED,"write site path")
                 ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile")
                 ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name");
-//                ->addArgument("include",InputArgument::IS_ARRAY | InputArgument::OPTIONAL,"write directories to include")
-//                ->addArgument("exclude",InputArgument::IS_ARRAY | InputArgument::OPTIONAL,"write directories to exclude");
 
     }
 
@@ -31,18 +29,20 @@ class BackupSiteCommand extends Command
     {
         $site_id=$input->getArgument("site_id");
         $sites_storage_local_path_root="/backup_sites";
-        $site_root = $input->getArgument("site_root")."/storage";
+        $site_root = $input->getArgument("site_root");
         $backup_dir_local_path = $sites_storage_local_path_root."/".$site_id;
         $aws_config_file_profile = $input->getArgument("profile");
         $bucket_name = $input->getArgument("bucket_name");
         $backup_logs_directory = "/backup_logs";
         $backup_logs_file = $backup_logs_directory."/backup_log_site_".$site_id.".txt";
         ##################################################################################################################
-        $output->writeln('<comment>Site backup locally...'.date("Y/m/d H:i:s").'</comment>');
+        $output->writeln('<comment>Create logs directory "'.$backup_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($backup_logs_directory) ){
             system("mkdir ".$backup_logs_directory);
             system("chmod 777 -R ".$backup_logs_directory);
         }
+        ##################################################################################################################
+        $output->writeln('<comment>Create staging directories "'.$sites_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($sites_storage_local_path_root) ){
             system("mkdir ".$sites_storage_local_path_root." >> ".$backup_logs_file);
             system("chmod 777 -R ".$sites_storage_local_path_root." >> ".$backup_logs_file);
@@ -52,11 +52,13 @@ class BackupSiteCommand extends Command
             system("chmod 777 -R ".$backup_dir_local_path." >> ".$backup_logs_file);
         }
         ##################################################################################################################
+        $output->writeln('<comment>Site backup localy...</comment>');
         system("rsync -av --delete ".$site_root." ".$backup_dir_local_path." >> ".$backup_logs_file);
         system("chmod -R 777 ".$sites_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Site backup on S3...</comment>');
-        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/backup_sites/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+        system("/snap/bin/aws s3api put-bucket-versioning --bucket ".$bucket_name." --versioning-configuration Status=Enabled --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file." &");
         ##################################################################################################################
         $output->writeln("Site backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 

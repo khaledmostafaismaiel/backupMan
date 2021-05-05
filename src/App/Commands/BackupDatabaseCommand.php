@@ -11,7 +11,7 @@ class BackupDatabaseCommand extends Command
 {
     protected function configure()
     {
-        $this->setName("database")
+        $this->setName("backup-database")
                 ->setHelp("database server_id type user password profile bucket_name
                                     server_id=if you have many servers
                                     backup_type=1 per user
@@ -42,19 +42,27 @@ class BackupDatabaseCommand extends Command
         $backup_logs_directory = "/backup_logs";
         $backup_logs_file = $backup_logs_directory."/backup_log_database_".$server_id.".txt";
         ##################################################################################################################
-        $output->writeln('<comment>Database backup locally...'.date("Y/m/d H:i:s").'</comment>');
+        $output->writeln('<comment>Create logs directory "'.$backup_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($backup_logs_directory) ){
             system("mkdir ".$backup_logs_directory);
             system("chmod 777 -R ".$backup_logs_directory);
         }
+        ##################################################################################################################
+        $output->writeln('<comment>Create staging directories "'.$databases_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($databases_storage_local_path_root) ){
             system("mkdir ".$databases_storage_local_path_root." >> ".$backup_logs_file);
             system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         }
         ##################################################################################################################
+        $output->writeln('<comment>Database backup locally...'.date("Y/m/d H:i:s").'</comment>');
         if( ($databasesBackupOption == 2) || ($databasesBackupOption == 3) ){
             system("chmod 777 - R /var/lib/mysql"." >> ".$backup_logs_file);
             system("rsync -av --delete /var/lib/mysql ".$databases_storage_local_path_root." >> ".$backup_logs_file);
+        }else{
+            if(is_dir($databases_storage_local_path_root."/mysql") ){
+                system("rm -rf ".$databases_storage_local_path_root."/mysql >> ".$backup_logs_file);
+                system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
+            }
         }
 
         if( ($databasesBackupOption == 1) || ($databasesBackupOption == 3) ){
@@ -66,14 +74,14 @@ class BackupDatabaseCommand extends Command
 
             foreach($databases as $db){
                 if( (($db != "information_schema")) && (($db != "performance_schema")) && (($db != "mysql")) && (($db != "_*" )) && (($db != "phpmyadmin")) && (($db != "sys")) ){
-                    system("mysqldump -u ".$user." -p".$password." --databases ".$db." > ".$databases_storage_local_path_root."/".$db."sql"." >> ".$backup_logs_file);
+                    system("mysqldump -u ".$user." -p".$password." --databases ".$db." > ".$databases_storage_local_path_root."/".$db.".sql");
                 }
             }
         }
         ##################################################################################################################
         system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
-        $output->writeln('<comment>Database backup on S3...</comment>');
+        $output->writeln('<comment>Database backup on S3...'.date("Y/m/d H:i:s").'</comment>');
         system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/".$server_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Database backup done successfully.".date("Y/m/d H:i:s")."\n\n");
