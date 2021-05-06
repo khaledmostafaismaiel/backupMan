@@ -52,7 +52,10 @@ class RestoreSiteCommand extends Command
         }
         ##################################################################################################################
         $output->writeln('<comment>restore site from S3 "'.$sites_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
-        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$sites_storage_local_path_root."   -t '".$at."' --max-workers 100 >> ".$restore_logs_file);
+        if(is_dir($sites_storage_local_path_root."/sites_backup/".$site_id) ){
+            system("rm -rf ".$sites_storage_local_path_root."/sites_backup/".$site_id." >> ".$restore_logs_file);
+        }
+        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$sites_storage_local_path_root." -p sites_backup/".$site_id." -t '".$at."' --max-workers 100 >> ".$restore_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Site restored locally...'.date("Y/m/d H:i:s").'</comment>');
         ##################################################################################################################
