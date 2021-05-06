@@ -12,15 +12,15 @@ class RestoreSiteCommand extends Command
     protected function configure()
     {
         $this->setName("restore-site")
-                ->setHelp("restore-site site_id bucket_name at profile
+                ->setHelp("restore-site site_id at bucket_name profile
                                     site_id=if you have many sites
                                     bucket_name=aws bucket which used for backup
                                     at=vetsioning time
                                     profile=aws user profile")
                 ->setDescription('used for restore sites')
                 ->addArgument("site_id",InputArgument::REQUIRED,"write your site id")
-                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
                 ->addArgument("at",InputArgument::REQUIRED,"write vetsioning time")
+                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
                 ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile");
 
     }
@@ -34,7 +34,7 @@ class RestoreSiteCommand extends Command
         $at=$input->getArgument("at");
         $aws_config_file_profile = $input->getArgument("profile");
         $restore_logs_directory = "/restore_logs";
-        $restore_logs_file = $restore_logs_directory."/restore_log_site_".$site_id.".txt";
+        $restore_logs_file = $restore_logs_directory."/restore_log_site_".$site_id."_".date("Y_m_d__H_i_s").".txt";
         ##################################################################################################################
         $output->writeln('<comment>Create logs directory "'.$restore_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($restore_logs_directory) ){
@@ -51,8 +51,8 @@ class RestoreSiteCommand extends Command
             system("rm -rf ".$restore_dir_local_path." >> ".$restore_logs_file);
         }
         ##################################################################################################################
-        $output->writeln('<comment>restore site from S3 ...."'.$sites_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
-        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$sites_storage_local_path_root." -p ".$site_id." -t '".$at."' --max-workers 100 >> ".$restore_logs_file." &");
+        $output->writeln('<comment>restore site from S3 "'.$sites_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
+        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$sites_storage_local_path_root."   -t '".$at."' --max-workers 100 >> ".$restore_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Site restored locally...'.date("Y/m/d H:i:s").'</comment>');
         ##################################################################################################################

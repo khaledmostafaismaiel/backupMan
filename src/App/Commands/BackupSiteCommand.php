@@ -12,7 +12,7 @@ class BackupSiteCommand extends Command
     protected function configure()
     {
         $this->setName("backup-site")
-                ->setHelp("backup-site site_id site_root profile bucket_name
+                ->setHelp("backup-site site_id site_root bucket_name profile
                                     site_id=if you have many sites
                                     site_root=site path
                                     profile=aws user profile
@@ -20,8 +20,8 @@ class BackupSiteCommand extends Command
                 ->setDescription('used for backup sites')
                 ->addArgument("site_id",InputArgument::REQUIRED,"write your site id")
                 ->addArgument("site_root",InputArgument::REQUIRED,"write site path")
-                ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile")
-                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name");
+                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
+                ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile");
 
     }
 
@@ -34,7 +34,7 @@ class BackupSiteCommand extends Command
         $aws_config_file_profile = $input->getArgument("profile");
         $bucket_name = $input->getArgument("bucket_name");
         $backup_logs_directory = "/backup_logs";
-        $backup_logs_file = $backup_logs_directory."/backup_log_site_".$site_id.".txt";
+        $backup_logs_file = $backup_logs_directory."/backup_log_site_".$site_id."_".date("Y_m_d__H_i_s").".txt";
         ##################################################################################################################
         $output->writeln('<comment>Create logs directory "'.$backup_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($backup_logs_directory) ){
@@ -58,7 +58,7 @@ class BackupSiteCommand extends Command
         ##################################################################################################################
         $output->writeln('<comment>Site backup on S3...</comment>');
         system("/snap/bin/aws s3api put-bucket-versioning --bucket ".$bucket_name." --versioning-configuration Status=Enabled --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
-        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file." &");
+        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/sites_backup/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Site backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 

@@ -12,7 +12,7 @@ class BackupDatabaseCommand extends Command
     protected function configure()
     {
         $this->setName("backup-database")
-                ->setHelp("database backup_type mysql_user mysql_password profile bucket_name
+                ->setHelp("database backup_type mysql_user mysql_password bucket_name profile
                                     backup_type=1 per user
                                                =2 all databases
                                                =3 both
@@ -24,8 +24,8 @@ class BackupDatabaseCommand extends Command
                 ->addArgument("backup_type",InputArgument::REQUIRED,"Select backup type")
                 ->addArgument("mysql_user",InputArgument::REQUIRED,"write mysql user")
                 ->addArgument("mysql_password",InputArgument::REQUIRED,"write mysql password")
-                ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile")
-                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name");
+                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
+                ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile");
 
     }
 
@@ -37,7 +37,7 @@ class BackupDatabaseCommand extends Command
         $aws_config_file_profile=$input->getArgument("profile");
         $bucket_name=$input->getArgument("bucket_name");
         $backup_logs_directory = "/backup_logs";
-        $backup_logs_file = $backup_logs_directory."/backup_log_database.txt";
+        $backup_logs_file = $backup_logs_directory."/backup_log_database_".date("Y_m_d__H_i_s").".txt";
         ##################################################################################################################
         $output->writeln('<comment>Create logs directory "'.$backup_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($backup_logs_directory) ){
@@ -79,7 +79,7 @@ class BackupDatabaseCommand extends Command
         system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Database backup on S3...'.date("Y/m/d H:i:s").'</comment>');
-        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/ --profile ".$aws_config_file_profile." >> ".$backup_logs_file." &");
+        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/ --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Database backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 

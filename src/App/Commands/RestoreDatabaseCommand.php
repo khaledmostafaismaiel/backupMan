@@ -12,7 +12,7 @@ class RestoreDatabaseCommand extends Command
     protected function configure()
     {
         $this->setName("restore-database")
-                ->setHelp("restore-database database_name bucket_name at profile
+                ->setHelp("restore-database database_name at bucket_name profile
                                     server_id=if you have many servers
                                     user=mysql user name if type [1,3]
                                     password=mysql user password if type [1,3]
@@ -21,8 +21,8 @@ class RestoreDatabaseCommand extends Command
                                     profile=aws user profile")
                 ->setDescription('used for backup databases per user or all daabases in "/var/lib/" or for both')
                 ->addArgument("database_name",InputArgument::REQUIRED,"write database name to restore")
-                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
                 ->addArgument("at",InputArgument::REQUIRED,"write vetsioning time")
+                ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
                 ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile");
 
     }
@@ -30,13 +30,13 @@ class RestoreDatabaseCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $databases_storage_local_path_root="/restore_database";
+        $databases_storage_local_path_root="/restored_database";
         $database_name=$input->getArgument("database_name");
         $aws_config_file_profile=$input->getArgument("profile");
         $bucket_name=$input->getArgument("bucket_name");
         $at=$input->getArgument("at");
         $restore_logs_directory = "/restore_logs";
-        $restore_logs_file = $restore_logs_directory."/restore_log_database.txt";
+        $restore_logs_file = $restore_logs_directory."/restore_log_database_".date("Y_m_d__H_i_s").".txt";
         ##################################################################################################################
         $output->writeln('<comment>Create logs directory "'.$restore_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($restore_logs_directory) ){
