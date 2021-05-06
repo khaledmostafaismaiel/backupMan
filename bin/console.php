@@ -12,6 +12,6 @@ $application->add(new \Console\App\Commands\RestoreDatabaseCommand());
 $application->add(new \Console\App\Commands\BackupSiteCommand());
 $application->add(new \Console\App\Commands\RestoreSiteCommand());
 $application->add(new \Console\App\Commands\SetupCommand());
-$application->add(new \Console\App\Commands\ConfigAWSCommand());
 $application->add(new \Console\App\Commands\AWSConfigureCommand());
 $application->run();
+

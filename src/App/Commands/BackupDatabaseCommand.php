@@ -12,8 +12,7 @@ class BackupDatabaseCommand extends Command
     protected function configure()
     {
         $this->setName("backup-database")
-                ->setHelp("database server_id type user password profile bucket_name
-                                    server_id=if you have many servers
+                ->setHelp("database backup_type mysql_user mysql_password profile bucket_name
                                     backup_type=1 per user
                                                =2 all databases
                                                =3 both
@@ -22,7 +21,6 @@ class BackupDatabaseCommand extends Command
                                     profile=aws user profile
                                     bucket_name=aws bucket which used for backup")
                 ->setDescription('used for backup databases per user or all daabases in "//var/lib/" or for both')
-                ->addArgument("server_id",InputArgument::REQUIRED,"write your server id")
                 ->addArgument("backup_type",InputArgument::REQUIRED,"Select backup type")
                 ->addArgument("mysql_user",InputArgument::REQUIRED,"write mysql user")
                 ->addArgument("mysql_password",InputArgument::REQUIRED,"write mysql password")
@@ -34,13 +32,12 @@ class BackupDatabaseCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $server_id=$input->getArgument("server_id");
         $databasesBackupOption=$input->getArgument("backup_type");
         $databases_storage_local_path_root="/backup_database";
         $aws_config_file_profile=$input->getArgument("profile");
         $bucket_name=$input->getArgument("bucket_name");
         $backup_logs_directory = "/backup_logs";
-        $backup_logs_file = $backup_logs_directory."/backup_log_database_".$server_id.".txt";
+        $backup_logs_file = $backup_logs_directory."/backup_log_database.txt";
         ##################################################################################################################
         $output->writeln('<comment>Create logs directory "'.$backup_logs_directory.'"...'.date("Y/m/d H:i:s").'</comment>');
         if(! is_dir($backup_logs_directory) ){
@@ -57,7 +54,7 @@ class BackupDatabaseCommand extends Command
         $output->writeln('<comment>Database backup locally...'.date("Y/m/d H:i:s").'</comment>');
         if( ($databasesBackupOption == 2) || ($databasesBackupOption == 3) ){
             system("chmod 777 - R /var/lib/mysql"." >> ".$backup_logs_file);
-            system("rsync -av --delete /var/lib/mysql ".$databases_storage_local_path_root." >> ".$backup_logs_file);
+            system("rsync -av --delete /var/lib/mysql ".$databases_storage_local_path_root." >> ".$backup_logs_file." &");
         }else{
             if(is_dir($databases_storage_local_path_root."/mysql") ){
                 system("rm -rf ".$databases_storage_local_path_root."/mysql >> ".$backup_logs_file);
@@ -82,10 +79,11 @@ class BackupDatabaseCommand extends Command
         system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Database backup on S3...'.date("Y/m/d H:i:s").'</comment>');
-        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/".$server_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/ --profile ".$aws_config_file_profile." >> ".$backup_logs_file." &");
         ##################################################################################################################
         $output->writeln("Database backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 
         return 0;
     }
 }
+

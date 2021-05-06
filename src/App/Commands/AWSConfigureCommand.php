@@ -39,65 +39,62 @@ class AWSConfigureCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $fake_aws_dir_path = "/home/khaled/aws";
-        $fake_aws_config_path = "/home/khaled/aws/config";
-        $fak_aws_creadentials_path = "/home/khaled/aws/credentials";
+        exec("cd ~/ && pwd",$output)[0];
+        $HOME = $output[0];
+
+        $aws_dir_path = $HOME."/.aws";
+        $aws_config_path = $aws_dir_path."/config";
+        $aws_creadentials_path = $aws_dir_path."/credentials";
         $aws_profile=$input->getArgument("profile");
         $aws_region=$input->getArgument("region");
         $aws_output=$input->getArgument("output");
         $aws_key=$input->getArgument("key");
         $aws_secret=$input->getArgument("secret");
 
-        Helper::deleteDirectory("/home/khaled/aws");
 
-        if(! is_dir("/home/khaled/.aws") ){
-            system("mkdir ".$fake_aws_dir_path);
-            system("chmod 777 -R ".$fake_aws_dir_path);
+        if(! is_dir($aws_dir_path) ){
+            system("mkdir ".$aws_dir_path);
+            system("chmod 777 -R ".$aws_dir_path);
         }else{
-            system("chmod 777 -R ".$fake_aws_dir_path);
-            Helper::copyDirectory("/home/khaled/.aws","/home/khaled/aws");
+            system("chmod 777 -R ".$aws_dir_path);
         }
 
-        if(! file_exists($fake_aws_config_path) ){
-            system("touch ".$fake_aws_config_path);
-            system("chmod 777 -R ".$fake_aws_dir_path);
+        if(! file_exists($aws_config_path) ){
+            system("touch ".$aws_config_path);
+            system("chmod 777 -R ".$aws_dir_path);
         }else{
-            system("chmod 777 -R ".$fake_aws_dir_path);
+            system("chmod 777 -R ".$aws_dir_path);
         }
 
-        $line_number = Helper::getLineNumber($fake_aws_config_path,$aws_profile);
+        $line_number = Helper::getLineNumber($aws_config_path,$aws_profile);
         if($line_number != -1 ){
-            Helper::deleteContentOccuranceByLineNumber($fake_aws_config_path, $line_number);
-            Helper::deleteContentOccuranceByLineNumber($fake_aws_config_path, $line_number);
-            Helper::deleteContentOccuranceByLineNumber($fake_aws_config_path, $line_number);
+            Helper::deleteContentOccuranceByLineNumber($aws_config_path, $line_number);
+            Helper::deleteContentOccuranceByLineNumber($aws_config_path, $line_number);
+            Helper::deleteContentOccuranceByLineNumber($aws_config_path, $line_number);
         }
         
-        Helper::contentToFile("[".$aws_profile."]\n",$fake_aws_config_path,"a");
-        Helper::contentToFile("region = ".$aws_region."\n",$fake_aws_config_path,"a");
-        Helper::contentToFile("output = ".$aws_output."\n",$fake_aws_config_path,"a");
+        Helper::contentToFile("[".$aws_profile."]\n",$aws_config_path,"a");
+        Helper::contentToFile("region = ".$aws_region."\n",$aws_config_path,"a");
+        Helper::contentToFile("output = ".$aws_output."\n",$aws_config_path,"a");
 
 
-        if(! is_dir($fak_aws_creadentials_path) ){
-            system("touch ".$fak_aws_creadentials_path);
-            system("chmod 777 -R ".$fake_aws_dir_path);
+        if(! is_dir($aws_creadentials_path) ){
+            system("touch ".$aws_creadentials_path);
+            system("chmod 777 -R ".$aws_dir_path);
         }else{
-            system("chmod 777 -R ".$fake_aws_dir_path);
+            system("chmod 777 -R ".$aws_dir_path);
         }
 
-        $line_number = Helper::getLineNumber($fak_aws_creadentials_path,$aws_profile);
+        $line_number = Helper::getLineNumber($aws_creadentials_path,$aws_profile);
         if($line_number != -1 ){
-            Helper::deleteContentOccuranceByLineNumber($fak_aws_creadentials_path, $line_number);
-            Helper::deleteContentOccuranceByLineNumber($fak_aws_creadentials_path, $line_number);
-            Helper::deleteContentOccuranceByLineNumber($fak_aws_creadentials_path, $line_number);
+            Helper::deleteContentOccuranceByLineNumber($aws_creadentials_path, $line_number);
+            Helper::deleteContentOccuranceByLineNumber($aws_creadentials_path, $line_number);
+            Helper::deleteContentOccuranceByLineNumber($aws_creadentials_path, $line_number);
         }
         
-        Helper::contentToFile("[".$aws_profile."]\n",$fak_aws_creadentials_path,"a");
-        Helper::contentToFile("aws_secret_access_key = ".$aws_key."\n",$fak_aws_creadentials_path,"a");
-        Helper::contentToFile("aws_access_key_id = ".$aws_secret."\n",$fak_aws_creadentials_path,"a");
-
-        Helper::deleteDirectory("/home/khaled/.aws");
-
-        Helper::moveDirectory("/home/khaled/aws","/home/khaled/.aws");
+        Helper::contentToFile("[".$aws_profile."]\n",$aws_creadentials_path,"a");
+        Helper::contentToFile("aws_secret_access_key = ".$aws_key."\n",$aws_creadentials_path,"a");
+        Helper::contentToFile("aws_access_key_id = ".$aws_secret."\n",$aws_creadentials_path,"a");
 
         return 0;
     }

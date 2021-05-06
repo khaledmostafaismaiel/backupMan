@@ -73,4 +73,12 @@ class Helper{
     {
         system("mv ".$from." ".$to);
     }
+
+    public static function deleteAllFilesExceptOne($path,$except)
+    {
+        system("cd ".$path." && find . \! -name ".$except." -delete");
+
+    }
+
 }
+

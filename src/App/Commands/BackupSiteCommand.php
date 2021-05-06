@@ -12,7 +12,7 @@ class BackupSiteCommand extends Command
     protected function configure()
     {
         $this->setName("backup-site")
-                ->setHelp("backup-site site_id site_path profile bucket_name [include] [exclude]
+                ->setHelp("backup-site site_id site_root profile bucket_name
                                     site_id=if you have many sites
                                     site_root=site path
                                     profile=aws user profile
@@ -49,7 +49,7 @@ class BackupSiteCommand extends Command
         }
         if(! is_dir($backup_dir_local_path) ){
             system("mkdir ".$backup_dir_local_path." >> ".$backup_logs_file);
-            system("chmod 777 -R ".$backup_dir_local_path." >> ".$backup_logs_file);
+            system("chmod 777 -R ".$sites_storage_local_path_root." >> ".$backup_logs_file);
         }
         ##################################################################################################################
         $output->writeln('<comment>Site backup localy...</comment>');
