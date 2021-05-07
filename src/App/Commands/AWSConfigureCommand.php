@@ -93,8 +93,8 @@ class AWSConfigureCommand extends Command
         }
         
         Helper::contentToFile("[".$aws_profile."]\n",$aws_creadentials_path,"a");
-        Helper::contentToFile("aws_secret_access_key = ".$aws_key."\n",$aws_creadentials_path,"a");
-        Helper::contentToFile("aws_access_key_id = ".$aws_secret."\n",$aws_creadentials_path,"a");
+        Helper::contentToFile("aws_secret_access_key = ".$aws_secret."\n",$aws_creadentials_path,"a");
+        Helper::contentToFile("aws_access_key_id = ".$aws_key."\n",$aws_creadentials_path,"a");
 
         return 0;
     }
