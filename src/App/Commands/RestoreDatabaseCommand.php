@@ -54,8 +54,8 @@ class RestoreDatabaseCommand extends Command
         }
         ##################################################################################################################
         $output->writeln('<comment>restore database from S3 ...."'.$databases_storage_local_path_root.'"...'.date("Y/m/d H:i:s").'</comment>');
-        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$databases_storage_local_path_root." -p database_backup/mysql/".$database_name." -t '".$at."' --max-workers 100 >> ".$restore_logs_file." &");
-        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$databases_storage_local_path_root." -p database_backup/".$database_name.".sql -t '".$at."' --max-workers 100 >> ".$restore_logs_file." &");
+        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$databases_storage_local_path_root." -p database_backup/mysql/".$database_name." -t '".$at."' --max-workers 100 >> ".$restore_logs_file);
+        system("/usr/local/bin/s3-pit-restore -b ".$bucket_name." -d ".$databases_storage_local_path_root." -p database_backup/".$database_name.".sql -t '".$at."' --max-workers 100 >> ".$restore_logs_file);
         ##################################################################################################################
         $output->writeln("Database restore done successfully.".date("Y/m/d H:i:s")."\n\n");
 

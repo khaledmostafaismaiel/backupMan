@@ -9,6 +9,9 @@
             "email": "khaledmostafa297@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
     "minimum-stability": "stable",
     "require": {}
 }
