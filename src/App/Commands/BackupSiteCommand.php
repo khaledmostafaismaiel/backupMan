@@ -57,8 +57,10 @@ class BackupSiteCommand extends Command
         system("chmod -R 777 ".$sites_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Site backup on S3...</comment>');
-        system("/snap/bin/aws s3api put-bucket-versioning --bucket ".$bucket_name." --versioning-configuration Status=Enabled --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
-        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/sites_backup/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+//        system("/snap/bin/aws s3api put-bucket-versioning --bucket ".$bucket_name." --versioning-configuration Status=Enabled --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+        system("/snap/bin/aws s3api put-bucket-versioning --bucket ".$bucket_name." --versioning-configuration Status=Enabled >> ".$backup_logs_file);
+//        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/sites_backup/".$site_id." --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+        system("/snap/bin/aws s3 sync --delete ".$backup_dir_local_path." s3://".$bucket_name."/sites_backup/".$site_id." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Site backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 

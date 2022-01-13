@@ -17,11 +17,11 @@ class RestoreDatabaseCommand extends Command
                                     user=mysql user name if type [1,3]
                                     password=mysql user password if type [1,3]
                                     bucket_name=aws bucket which used for backup
-                                    at=vetsioning time
+                                    at=versioning time
                                     profile=aws user profile")
-                ->setDescription('used for backup databases per user or all daabases in "/var/lib/" or for both')
+                ->setDescription('used for backup databases per user or all databases in "/var/lib/" or for both')
                 ->addArgument("database_name",InputArgument::REQUIRED,"write database name to restore")
-                ->addArgument("at",InputArgument::REQUIRED,"write vetsioning time")
+                ->addArgument("at",InputArgument::REQUIRED,"write versioning time")
                 ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
                 ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile");
 

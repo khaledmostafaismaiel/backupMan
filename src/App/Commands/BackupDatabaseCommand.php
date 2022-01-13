@@ -53,7 +53,7 @@ class BackupDatabaseCommand extends Command
         ##################################################################################################################
         $output->writeln('<comment>Database backup locally...'.date("Y/m/d H:i:s").'</comment>');
         if( ($databasesBackupOption == 2) || ($databasesBackupOption == 3) ){
-            system("chmod 777 - R /var/lib/mysql"." >> ".$backup_logs_file);
+            system("chmod 777 -R /var/lib/mysql"." >> ".$backup_logs_file);
             system("rsync -av --delete /var/lib/mysql ".$databases_storage_local_path_root." >> ".$backup_logs_file." &");
         }else{
             if(is_dir($databases_storage_local_path_root."/mysql") ){
@@ -79,7 +79,8 @@ class BackupDatabaseCommand extends Command
         system("chmod 777 -R ".$databases_storage_local_path_root." >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln('<comment>Database backup on S3...'.date("Y/m/d H:i:s").'</comment>');
-        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/ --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+//        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/ --profile ".$aws_config_file_profile." >> ".$backup_logs_file);
+        system("/snap/bin/aws s3 sync --delete ".$databases_storage_local_path_root." s3://".$bucket_name."/database_backup/ >> ".$backup_logs_file);
         ##################################################################################################################
         $output->writeln("Database backup done successfully.".date("Y/m/d H:i:s")."\n\n");
 

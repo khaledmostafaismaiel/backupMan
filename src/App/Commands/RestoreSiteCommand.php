@@ -15,11 +15,11 @@ class RestoreSiteCommand extends Command
                 ->setHelp("restore-site site_id at bucket_name profile
                                     site_id=if you have many sites
                                     bucket_name=aws bucket which used for backup
-                                    at=vetsioning time
+                                    at=versioning time
                                     profile=aws user profile")
                 ->setDescription('used for restore sites')
                 ->addArgument("site_id",InputArgument::REQUIRED,"write your site id")
-                ->addArgument("at",InputArgument::REQUIRED,"write vetsioning time")
+                ->addArgument("at",InputArgument::REQUIRED,"write versioning time")
                 ->addArgument("bucket_name",InputArgument::REQUIRED,"write your aws bucket name")
                 ->addArgument("profile",InputArgument::REQUIRED,"write your aws profile");
 
